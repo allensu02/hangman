@@ -1,0 +1,100 @@
+package hangman;
+import java.io.*;
+import java.util.*;
+
+public class Hangman {
+
+	public static void main (String[]args) throws FileNotFoundException {
+		Scanner console = new Scanner (System.in);
+		Scanner input = new Scanner (new File("hangmanwordbank.txt"));
+		Random rand = new Random();
+		List<String> words = new ArrayList<String>();
+		while (input.hasNext()) {
+			words.add(input.next());
+			
+		}
+		
+		boolean weArePlaying = true;
+		while (weArePlaying) {
+			System.out.println("Welcome to this game of hangman");
+			/*chooses a random int from 0 to whatever the length of the words array is
+			and then converts that word to an array of chars
+			ex. reddit -> 'r','e','d','d','i','t'
+			*/
+			char[] randomWordToGuess = words.get(rand.nextInt(words.size())).toCharArray();
+			
+			int amountOfGuesses = randomWordToGuess.length + 3; //chose the amount of guesses to be the length of the word + 2
+			
+			//_____ the player's guess
+			char[] playerGuess = new char[randomWordToGuess.length];
+			for (int i = 0; i < playerGuess.length; i++) {
+				 playerGuess[i] = '_';
+				 
+			}
+			
+			boolean wordIsGuessed = false;
+			int tries = 0;
+			
+			while (!wordIsGuessed && tries != amountOfGuesses) {
+				System.out.print("Current guesses: "	);
+				printArray(playerGuess);
+				int guessesleft = amountOfGuesses - tries;
+				System.out.println("You have " + guessesleft + " guesses left.");
+				System.out.print("What is your next guess: ");
+				char guess = console.nextLine().charAt(0);
+				tries++;
+				//if user inputs a - game will end
+				if (guess == '-'	) {
+					weArePlaying = false;
+					wordIsGuessed = true;
+				} else {
+					for (int i = 0; i < randomWordToGuess.length; i++) {
+						if (randomWordToGuess[i] == guess) {
+							playerGuess[i] = guess;
+							tries--;
+						}
+					}
+					if (isTheWordGuessed(playerGuess) == true) {
+						wordIsGuessed = true;
+						printArray(playerGuess);
+						System.out.println("Congratulations! You've won!");
+					}
+				}
+				
+				
+			}
+			if (!wordIsGuessed) {
+				System.out.println("You ran out of guesses");
+				System.out.print("The word was: ");
+				printArray(randomWordToGuess);
+				System.out.print("Do you want to play another game? yes/no: ");
+				String answer = console.nextLine();
+				if (answer.equals("no") == true) {
+					weArePlaying = false;
+				}	
+			}
+			
+		}
+		
+		System.out.println("Game Over");
+	}
+	//method to print an array in the format:r e d d i t
+	public static void printArray (char[] array) {
+		for (int i = 0; i < array.length; i++) {
+			System.out.print(array[i] + " ");
+		}
+		System.out.println();	
+	}
+	//if the word still has any _ it hasn't been guessed
+	public static boolean isTheWordGuessed (char[]array) {
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == '_') {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
+
+
